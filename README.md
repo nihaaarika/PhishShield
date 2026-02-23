@@ -4,7 +4,7 @@ ScamGuard AI is a multi-class NLP-based scam message detection system that class
 An end-to-end NLP pipeline using TF-IDF and Logistic Regression for multi-class scam detection with explainable AI, real-time risk scoring, and an interactive Streamlit interface.
 
 
-#✨ Features
+# ✨ Features
 
 🔍 Multi-Class Scam Detection
 Classifies messages into Phishing, OTP Fraud, Lottery Scam, Job Scam, or Safe using an NLP-based machine learning model.
