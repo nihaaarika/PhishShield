@@ -1,0 +1,31 @@
+text,label
+"hey are we still meeting for study group at 5pm?",Safe
+"your package arrived. pick up at the front desk when you can.",Safe
+"reminder: assignment due tonight at 11:59pm on the course portal.",Safe
+"thanks for sending the notes. really helpful!",Safe
+"can you share the zoom link for the class?",Safe
+"club meeting moved to thursday. see you there.",Safe
+"your bank account is suspended. verify your login now at http://secure-login.example.com",Phishing
+"urgent: unusual activity detected. click the link to confirm your account.",Phishing
+"reset your password immediately to avoid account closure.",Phishing
+"security alert: update your details to continue using your account.",Phishing
+"your email will be locked. verify your password here: www.verify-now.example",Phishing
+"confirm your account to restore access. act now!",Phishing
+"your otp code is 928144. share the code to verify.",OTP Scam
+"i need the verification code you received. send me the otp asap.",OTP Scam
+"otp expires in 2 minutes. reply with the code.",OTP Scam
+"do not share this code. but send it to me to confirm payment.",OTP Scam
+"your one time code is 443210. verify this code now.",OTP Scam
+"2fa code received? send me the code to complete login.",OTP Scam
+"congratulations! you have won a prize. claim your reward now.",Lottery Scam
+"you are selected for a free gift. claim your prize today.",Lottery Scam
+"winner announcement: you won the lottery jackpot. pay fee to claim.",Lottery Scam
+"limited time offer! claim your prize by clicking the link.",Lottery Scam
+"you have won $1000 reward. click the link to receive it.",Lottery Scam
+"congratulations you are selected. claim your gift immediately.",Lottery Scam
+"we are hiring! remote job. no experience required. contact hr on telegram.",Job Scam
+"work from home opportunity. daily pay $200. message on whatsapp.",Job Scam
+"interview scheduled. send your resume and a small deposit to confirm.",Job Scam
+"job offer: start today. pay training fee to begin.",Job Scam
+"recruiter here. high salary remote role. move to telegram for details.",Job Scam
+"hiring urgently. quick interview. pay deposit and start asap.",Job Scam
