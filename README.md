@@ -1,29 +1,287 @@
-# ScamGuard AI
-ScamGuard AI is a multi-class NLP-based scam message detection system for student cybersecurity awareness. It classifies messages into **Safe**, **Phishing**, **OTP Scam**, **Lottery Scam**, or **Job Scam**.
+<div align="center">
 
-The project includes a modular ML backend (TF-IDF + Logistic Regression), a prediction engine with probability + risk score (0–100), and a Streamlit UI with explainable outputs (suspicious keywords/phrases + human-readable reasons).
+<h1>🛡️ PhishShield — ScamGuard AI</h1>
+
+<p>A multi-class NLP system that detects SMS and message-based scams in real time.<br/>
+Built for student cybersecurity awareness. Classifies threats. Explains why. Tells you what to do.</p>
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.45-red?logo=streamlit&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.6-orange?logo=scikit-learn&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+
+<img src="https://img.shields.io/badge/Scam%20Categories-5-purple" />
+<img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" />
+
+</div>
+
+---
+
+## What is PhishShield?
+
+PhishShield (powered by **ScamGuard AI**) is a real-time scam message detection tool built with NLP. Paste any suspicious SMS, email, or chat message and it instantly tells you:
+
+- **What type of scam it is** — Phishing, OTP Scam, Lottery Scam, Job Scam, or Safe
+- **How dangerous it is** — a risk score from 0 to 100 with a color-coded threat level
+- **Why it flagged it** — suspicious keywords, scam-style phrases, URLs, phone numbers, and money mentions
+- **What to do next** — dynamic safety tips tailored to the specific scam type
+
+> Built to protect students and everyday users from India's most common digital scams.
+
+---
+
+## Demo
+
+| Message | Label | Risk Score | Reason |
+|---|---|---|---|
+| `Your bank account is suspended. Verify now: http://secure-login.xyz` | 🔴 Phishing | 91/100 | Contains a link; Suspicious keywords: verify, account, bank |
+| `Your OTP is 928144. Reply with the code to verify.` | 🔴 OTP Scam | 85/100 | Scam-style phrase: your code is; Suspicious keywords: otp, code |
+| `Congratulations! You have won a prize. Claim today.` | 🟠 Lottery Scam | 78/100 | Scam-style phrase: you have won; Suspicious keywords: prize, claim |
+| `We are hiring! Work from home. Contact HR on Telegram.` | 🟠 Job Scam | 72/100 | Suspicious keywords: hiring, telegram, work from home |
+| `Hey, are we still meeting for the study group at 5pm?` | 🟢 Safe | 4/100 | No common scam patterns detected |
+
+---
 
 ## Features
-- Multi-class scam detection (TF-IDF + Logistic Regression)
-- Probability + risk score (0–100) with color-coded risk levels
-- Explainability panel (pattern/keyword detection)
-- Dynamic safety tips based on scam type
-- Mini dashboard (session stats)
 
-## Quickstart (Windows / PowerShell)
-1) Install dependencies:
-```powershell
-.\venv\Scripts\python.exe -m pip install -r requirements.txt
+- **Multi-class scam detection** — 5 categories: Safe, Phishing, OTP Scam, Lottery Scam, Job Scam
+- **Risk scoring** — 0–100 score combining model confidence and pattern signals
+- **Explainability panel** — shows exactly which keywords and phrases triggered the alert
+- **URL / phone / money detection** — regex-based signal extraction on top of the ML model
+- **Dynamic safety tips** — advice changes based on the scam type detected
+- **Session dashboard** — tracks how many scams detected in the current session
+- **Example messages** — one-click examples for each scam category
+
+---
+
+## Architecture
+
+```
+User pastes a message
+        │
+        ▼
+┌─────────────────────────────────────────────────────────┐
+│                      app.py  (Streamlit UI)             │
+│  Input box · Example picker · Result panel · Dashboard  │
+└───────────────────┬─────────────────────────────────────┘
+                    │  calls
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│                 scamguard/  (Python package)            │
+│                                                         │
+│  preprocessing.py   →   clean_text()                   │
+│       │                 Lowercase, strip URLs/noise     │
+│       ▼                                                 │
+│  model.py           →   ScamModel                      │
+│       │                 TF-IDF vectorizer               │
+│       │                 + Logistic Regression           │
+│       ▼                                                 │
+│  predictor.py       →   ScamGuard.analyze()            │
+│       │                 Predicts label + probability    │
+│       ▼                                                 │
+│  explain.py         →   detect_patterns()              │
+│       │                 Keywords, phrases, URL/phone/   │
+│       │                 money regex signals             │
+│       ▼                                                 │
+│  config.py          →   PATTERNS_BY_CLASS              │
+│       │                 All scam keywords and phrases   │
+│       ▼                                                 │
+│  tips.py            →   get_tips()                     │
+│                         Safety advice per scam type    │
+└───────────────────┬─────────────────────────────────────┘
+                    │  returns AnalysisResult
+                    ▼
+         Label · Confidence · Risk Score
+         Suspicious Keywords · Phrases
+         Has URL / Phone / Money
+         Reason · Safety Tips
 ```
 
-2) (Optional) Train and save a model:
-```powershell
+### Module responsibilities
+
+| File | Purpose |
+|---|---|
+| `app.py` | Streamlit frontend — UI layout, session state, result rendering |
+| `scamguard/__init__.py` | Exports the `ScamGuard` class as the public API |
+| `scamguard/preprocessing.py` | Text cleaning — lowercasing, URL stripping, whitespace normalisation |
+| `scamguard/features.py` | Feature extraction pipeline |
+| `scamguard/model.py` | TF-IDF vectorizer + Logistic Regression training and loading |
+| `scamguard/predictor.py` | Core `ScamGuard.analyze()` — orchestrates prediction and scoring |
+| `scamguard/explain.py` | Pattern detection — keywords, phrases, URL/phone/money regex |
+| `scamguard/config.py` | All scam patterns, severity weights, and class definitions |
+| `scamguard/tips.py` | Safety tip generator, keyed by predicted scam type |
+| `scripts/train.py` | Standalone training script — trains and saves `model.joblib` |
+| `data/sample_messages.csv` | Labelled training data (text, label) |
+
+---
+
+## Project Structure
+
+```
+PhishShield/
+├── app.py                        # Streamlit app entry point
+├── requirements.txt              # Pinned dependencies
+├── LICENSE                       # MIT License
+├── CONTRIBUTING.md               # Contribution guide
+│
+├── data/
+│   └── sample_messages.csv       # Training dataset (text, label)
+│
+├── scamguard/                    # Core detection package
+│   ├── __init__.py
+│   ├── config.py                 # Scam patterns, keywords, severity
+│   ├── explain.py                # Explainability engine
+│   ├── features.py               # Feature extraction
+│   ├── model.py                  # ML model (TF-IDF + Logistic Regression)
+│   ├── predictor.py              # Main analysis orchestrator
+│   ├── preprocessing.py          # Text cleaning
+│   ├── tips.py                   # Safety tip generator
+│   └── artifacts/
+│       └── model.joblib          # Saved model (auto-generated, git-ignored)
+│
+└── scripts/
+    └── train.py                  # Model training script
+```
+
+---
+
+## Scam Categories
+
+| Category | Description | Example signal |
+|---|---|---|
+| **Phishing** | Fake login pages, credential theft, account suspension threats | "verify your account", suspicious URLs |
+| **OTP Scam** | Social engineering to steal one-time passwords | "share the code", "your OTP is" |
+| **Lottery Scam** | Fake prize or reward claims | "you have won", "claim your prize" |
+| **Job Scam** | Fake job offers, upfront payment requests via Telegram/WhatsApp | "work from home", "contact HR on Telegram" |
+| **Safe** | Legitimate messages with no scam signals | Normal conversation, study plans |
+
+---
+
+## Quickstart
+
+### Prerequisites
+
+- Python 3.10 or higher
+- Git
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/nihaaarika/PhishShield.git
+cd PhishShield
+
+# 2. Create a virtual environment
+python -m venv venv
+
+# Windows
+.\venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+```
+
+### Train the model (optional)
+
+If no saved model exists, the app trains automatically on first run. To train manually:
+
+```bash
+# Windows
 .\venv\Scripts\python.exe scripts\train.py
+
+# macOS / Linux
+python scripts/train.py
 ```
 
-3) Run the Streamlit app:
-```powershell
+The trained model is saved to `scamguard/artifacts/model.joblib`.
+
+### Run the app
+
+```bash
+# Windows
 .\venv\Scripts\python.exe -m streamlit run app.py
+
+# macOS / Linux
+streamlit run app.py
 ```
 
-Note: If no saved model exists, the app will train a lightweight starter model from `data/sample_messages.csv` on first run and save it to `scamguard/artifacts/model.joblib`.
+Open `http://localhost:8501` in your browser.
+
+---
+
+## How It Works
+
+### 1. Text preprocessing
+Raw message → `preprocessing.py` → lowercased, URLs stripped, whitespace normalised.
+
+### 2. ML classification
+Cleaned text → TF-IDF vectorizer → Logistic Regression → predicted label + class probabilities.
+
+### 3. Risk scoring
+Risk score (0–100) = weighted combination of:
+- Model confidence (probability of predicted class)
+- Base severity by class (Phishing = 90, OTP Scam = 85, Lottery = 75, Job = 70, Safe = 0)
+- Pattern bonus from `explain.py` (+6 per keyword, +10 per phrase, +10 for URL, +10 for money mention)
+
+### 4. Explainability
+`explain.py` runs independently of the ML model using regex and keyword matching:
+- Checks for class-specific keywords from `config.py`
+- Checks for scam-style phrases
+- Detects URLs (`http://`, `www.`)
+- Detects phone numbers
+- Detects money/payment mentions (`₹`, `$`, `INR`)
+
+### 5. Safety tips
+`tips.py` returns a tailored list of 3–5 action items based on the predicted scam type.
+
+---
+
+## Dataset Format
+
+Training data lives in `data/sample_messages.csv` with two columns:
+
+```csv
+text,label
+"Your bank account is suspended. Verify now: http://secure-login.xyz","Phishing"
+"Hey, are we meeting at 5pm?","Safe"
+```
+
+Valid labels: `Safe`, `Phishing`, `OTP Scam`, `Lottery Scam`, `Job Scam`
+
+To contribute data, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## Contributing
+
+Contributions are welcome — code, data, documentation, or bug reports. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+---
+
+## Roadmap
+
+- [ ] Expand dataset to 1000+ real-world labeled messages
+- [ ] Add cross-validation and F1/confusion matrix reporting to `train.py`
+- [ ] Add Hindi and Hinglish scam pattern support
+- [ ] Add pytest test suite for all core modules
+- [ ] Add FastAPI REST endpoint for external integrations
+- [ ] Deploy to Streamlit Cloud with live demo link
+- [ ] Integrate LIME/SHAP for model-level explainability
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Author
+
+**Nihaarika** — Built as part of a student cybersecurity awareness initiative.
+
+*If this tool helped you identify a scam, it worked. Stay safe online.*
