@@ -30,26 +30,11 @@ def get_guard() -> ScamGuard:
 st.title("ScamGuard AI – Real-Time Scam Detection")
 st.caption("For student cybersecurity awareness. If this looks dangerous, verify via official channels.")
 
-examples = {
-    "Phishing": "Your bank account is suspended. Verify your login now: http://secure-login.example.com",
-    "OTP Scam": "Your OTP code is 928144. Reply with the code to verify.",
-    "Lottery Scam": "Congratulations! You have won a prize. Claim your reward today.",
-    "Job Scam": "We are hiring! Remote job. Contact HR on Telegram to start today.",
-    "Safe": "Hey, are we still meeting for the study group at 5pm?",
-}
-
-col_a, col_b = st.columns([2, 1])
-with col_a:
-    st.text_area(
-        "Paste a message to analyze",
-        height=190,
-        placeholder="Enter the message text...",
-        key="message",
-    )
-with col_b:
-    picked = st.selectbox("Try an example", list(examples.keys()), index=0, key="example_type")
-    if st.button("Use example"):
-        st.session_state["message"] = examples[picked]
+message = st.text_area(
+    "Paste a message to analyze",
+    height=190,
+    placeholder="Enter the message text...",
+)
 
 analyze = st.button("Analyze", type="primary", use_container_width=True)
 
@@ -57,7 +42,6 @@ if "stats" not in st.session_state:
     st.session_state["stats"] = {"total": 0, "scams": 0, "counts": {}}
 
 if analyze:
-    message = st.session_state.get("message", "")
     if not message.strip():
         st.warning("Please paste a message first.")
     else:
@@ -66,7 +50,9 @@ if analyze:
         st.session_state["stats"]["total"] += 1
         if out.label != "Safe":
             st.session_state["stats"]["scams"] += 1
-        st.session_state["stats"]["counts"][out.label] = st.session_state["stats"]["counts"].get(out.label, 0) + 1
+        st.session_state["stats"]["counts"][out.label] = (
+            st.session_state["stats"]["counts"].get(out.label, 0) + 1
+        )
 
         st.subheader("Result")
         color, risk_band = _label_color(out.label, out.risk_score)
